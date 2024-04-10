@@ -22,7 +22,7 @@ class Point :public Location
 protected:
 	bool is_visible;
 public:
-	Point(int init_x, int init_y, bool is_visible);
+	Point(int init_x, int init_y, bool init_visible);
 	~Point();
 
 	// getters, setters
@@ -40,7 +40,7 @@ class Circle :public Point
 protected:
 	int radius;
 public:
-	Circle(int init_x, int init_y, bool is_visible, int radius);
+	Circle(int init_x, int init_y, bool init_visible, int radius);
 	~Circle();
 	// getters, setters
 	int get_radius() { return radius; }
@@ -55,7 +55,7 @@ class Ring :public Circle
 protected:
 	int wide;
 public:
-	Ring(int init_x, int init_y, bool is_visible, int init_radius, int init_wide);
+	Ring(int init_x, int init_y, bool init_visible, int init_radius, int init_wide);
 	~Ring();
 	// getters, setters
 	int get_wide() { return wide; }

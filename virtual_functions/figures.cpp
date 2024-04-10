@@ -1,4 +1,5 @@
 #include <iostream>
+#include "figures.h"
 #include <Windows.h>
 #include "figures.h"
 using namespace std;
@@ -53,7 +54,7 @@ void Point::Drag(int delta)
 			Show();
 		} // else if
 		else if (KEY_DOWN(VK_RIGHT))
-		{
+{
 			x += delta;
 			Hide();
 			Show();
