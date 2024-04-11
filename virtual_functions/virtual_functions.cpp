@@ -2,10 +2,24 @@
 //
 
 #include <iostream>
+#include <Windows.h>
+using namespace std;
+#include "figures.h"
 
+HDC hdc;
 int main()
 {
-    std::cout << "Hello World!\n";
+    hdc = GetDC(GetConsoleWindow()); // Получаем контекст устройства консоли
+    RectAngle a_circle(50, 50, 0, 100, 100, 5);
+    a_circle.Show();
+    cin.get();
+    a_circle.Hide();
+    cin.get();
+    a_circle.Move_to(30, 30, 70, 70);
+    cin.get();
+    a_circle.Drag(10);
+    cin.get();
+    ReleaseDC(GetConsoleWindow(), hdc); // Освобождаем контекст устройства после использования
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
