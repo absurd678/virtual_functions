@@ -215,6 +215,11 @@ void Line::Drag(int delta)
 
 
 // -------------------------------------------------------Rectangle-------------------------------------------------
+RectAngle::RectAngle(int init_x, int init_y, bool init_visibility, int init_x1, int init_y1, int init_wide, int* init_color) :Line(init_x, init_y, init_visibility, init_x1, init_y1, init_color)
+{
+	wide = init_wide;
+} // Rectangle
+
 void RectAngle::Show()
 {
 	is_visible = 1;
@@ -235,3 +240,5 @@ void RectAngle::Hide()
 
 	DeleteObject(hPen);
 } // Hide
+
+

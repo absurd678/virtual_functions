@@ -34,9 +34,11 @@ protected:
 	bool is_visible;
 	int colorData[COLLEN]; // три параметра цвета
 public:
-	Point(int init_x, int init_y, bool init_visible) :Location(init_x, init_y)
+	Point(int init_x, int init_y, bool init_visible, int* init_color) :Location(init_x, init_y)
 	{
 		is_visible = init_visible;
+		for (int i = 0; i < COLLEN; i++)
+			colorData[i] = init_color[i];
 	} // Point
 	~Point() {}
 	// getters, setters
@@ -56,7 +58,7 @@ class Circle :public Point
 protected:
 	int radius;
 public:
-	Circle(int init_x, int init_y, bool init_visible, int init_radius) :Point(init_x, init_y, init_visible)
+	Circle(int init_x, int init_y, bool init_visible, int init_radius, int* init_color) :Point(init_x, init_y, init_visible, init_color)
 	{
 		radius = init_radius;
 	} // Circle
@@ -76,7 +78,7 @@ class Ring :public Circle
 protected:
 	int wide; // Толщина кольца
 public:
-	Ring(int init_x, int init_y, bool init_visible, int init_radius, int init_wide) :Circle(init_x, init_y, init_visible, init_radius)
+	Ring(int init_x, int init_y, bool init_visible, int init_radius, int init_wide, int* init_color) :Circle(init_x, init_y, init_visible, init_radius, init_color)
 	{
 		wide = init_wide;
 	} // Ring
@@ -96,7 +98,7 @@ class Line :public Point
 protected:
 	int x1, y1; // координаты второй точки
 public:
-	Line(int init_x, int init_y, bool init_visibility, int init_x1, int init_y1) :Point(init_x, init_y, init_visibility)
+	Line(int init_x, int init_y, bool init_visibility, int init_x1, int init_y1, int* init_color) :Point(init_x, init_y, init_visibility, init_color)
 	{
 		x1 = init_x1; y1 = init_y1;
 	} // Line
@@ -119,10 +121,7 @@ class RectAngle :public Line
 protected:
 	int wide; // Толщина линий пр-ка
 public:
-	RectAngle(int init_x, int init_y, bool init_visibility, int init_x1, int init_y1, int init_wide) :Line(init_x, init_y, init_visibility, init_x1, init_y1)
-	{
-		wide = init_wide;
-	} // Rectangle
+	RectAngle(int init_x, int init_y, bool init_visibility, int init_x1, int init_y1, int init_wide, int* init_color);
 	~RectAngle(){}
 	// getters, setters
 	int get_wide() { return wide; }
@@ -132,3 +131,5 @@ public:
 	void Show();
 	void Hide();
 }; // Rectangle
+
+
