@@ -1,151 +1,104 @@
 ﻿// virtual_functions.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
 
+/***********************************************************************************
+*                         Программирование                                         *
+************************************************************************************
+*Project type :Win64 Console Application                                           *
+*Project name_bus :virtual_functions.sln                                           *
+*File name_bus    :virtual_functions.cpp                                           *
+*Language     :CPP, MSVS 2022                                                      *
+*Programmers  :Кожевников Артем Вадимович,  М3О-209Б-22                            *
+*Modified By  :                                                                    *
+*Created      :10.04.2024                                                          *
+*Last revision:17.04.2024                                                          *
+*Comment      :                                                                    *
+***********************************************************************************/
+
 #include <iostream>
 #include <Windows.h>
 using namespace std;
 #include "figures.h"
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
-// КОНСТАНТЫ
-const int FrameWide = 10;
-int red[3] = { 255, 0, 0 };
-int black[3] = { 0, 0, 0 };
-
-struct Bike
-{
-    RectAngle* handlebar;  // руль
-    RectAngle* rudder_frame;  // рама руля
-    RectAngle* frame;  // рама
-    RectAngle* seat;  // сиденье
-    Ring* wheel1;  // колесо 1
-    Ring* wheel2;  // колесо 2
-};
-
-void CreateBike(int len_handlebar, int LenRudder, int WheelRad, int FrameLen, int FrameHeight, int x, int y, Bike& new_bike);
-void ShowBike(Bike bike);
-void HideBike(Bike bike);
-void MoveBikeTo(int len_handlebar, int LenRudder, int WheelRad, int FrameLen, int FrameHeight, int x, int y, Bike& new_bike);
-void DragBike(int delta, int len_handlebar, int LenRudder, int WheelRad, int FrameLen, int FrameHeight, int x, int y, Bike& new_bike); 
-// вызывать по очереди drag у каждого объекта - неправильное решение.
-// Если создавать класс велика, то нужно сделать множественное наследование. Но тогда возникает неоднозначность полей x, y в конструкторе
 
 
+//----------------------------ПЕРЕМЕННЫЕ-----------------------------------
 HDC hdc;
+
+//----------------------------ОСНОВНАЯ ПРОГРАММА-------------------------------------
 int main()
 {
     hdc = GetDC(GetConsoleWindow()); // Получаем контекст устройства консоли
-	Bike bike;
-	int len_handlebar = 80; 
-	int LenRudder = 100; 
-	int WheelRad = 20;
-	int FrameLen = 100;
-	int FrameHeight = 50; 
-	int x = 50; int y = 50;
-	CreateBike(len_handlebar, LenRudder, WheelRad, FrameLen, FrameHeight, x, y, bike);
-	ShowBike(bike);
+
+	// Статические VS Виртуальные методы
+	Point rect1 = Point(50, 50, 0);
+	rect1.Show();
 	cin.get();
-	HideBike(bike);
+	rect1.Hide();
 	cin.get();
-	DragBike(10, len_handlebar, LenRudder, WheelRad, FrameLen, FrameHeight, x, y, bike); // esc
+	rect1.Move_to(100, 100);  // Сравнить два связывания 
+	cin.get();
+	rect1.Drag(50);
+	cin.get();
+	
+
+	// Велосипед
+	
+	int len_handlebar = 80; // Длина руля 
+	int LenRudder = 100; // Высота рамы руля
+	int WheelRad = 40;  // Радиус колес
+	int FrameLen = 100;  // Длина рамы
+	int FrameHeight = 50;  // Высота рамы
+	int x = 50; int y = 50;  // Координаты велосипеда (определяют координаты руля!)
+
+	// Bicycle
+	//Bicycle bike = Bicycle(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10);
+	//bike.Show();
+	//cin.get();
+	//bike.Hide();
+	//cin.get();
+	//bike.Move_to(x+50, y+50);
+	//cin.get();
+	//bike.Drag(50); // esc
+	//cin.get();
+	
+	//Speed
+	SpeedBike sp_bike = SpeedBike(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 80);
+	sp_bike.Show();
+	cin.get();
+	sp_bike.Hide();
+	cin.get();
+	sp_bike.Move_to(x + 50, y + 50);
+	cin.get();
+	sp_bike.Drag(sp_bike.get_speed()); // esc
+	cin.get();
+	sp_bike.Hide();
+
+	//Mount
+	MountBike mon_bike = MountBike(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 5);
+	mon_bike.Show();
+	cin.get();
+	mon_bike.Hide();
+	cin.get();
+	mon_bike.Move_to(x + 50, y + 50);
+	cin.get();
+	mon_bike.Drag(10); // esc
+	cin.get();
+	mon_bike.Hide();
+
+
+	//Damaged
+	DamagedBike dam_bike = DamagedBike(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10);
+	dam_bike.Show();
+	cin.get();
+	dam_bike.Hide();
+	cin.get();
+	dam_bike.Move_to(x + 50, y + 50);
+	cin.get();
+	dam_bike.Drag(10); // esc
+	cin.get();
+	dam_bike.Hide();
+
     ReleaseDC(GetConsoleWindow(), hdc); // Освобождаем контекст устройства после использования
-}
+} // main
 
-void CreateBike(int len_handlebar, int LenRudder, int WheelRad, int FrameLen, int FrameHeight, int x, int y, Bike& new_bike)
-{
-    int init_x, init_y, init_x1, init_y1;
-    // руль
-    new_bike.handlebar = new RectAngle(x, y, 0, x + len_handlebar, y + FrameWide, FrameWide, black);
-    // рама руля
-    init_x = x + len_handlebar / 2 - FrameWide / 2;
-    init_y = y + FrameWide;
-    new_bike.rudder_frame = new RectAngle(init_x, init_y, 0, init_x + FrameWide, y + LenRudder, FrameWide, red);
-	// рама
-    init_x += FrameWide;
-	init_y = y + FrameWide + 0.3*LenRudder;
-	new_bike.frame = new RectAngle(init_x, init_y, 0, init_x + FrameLen, init_y + 0.6*LenRudder, FrameWide, red);
-	// сиденье
-	init_x = init_x + FrameLen - FrameWide;
-	init_y -= FrameWide;
-	new_bike.seat = new RectAngle(init_x, init_y, 0, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight, FrameWide, black);
-	// колесо 1
-	init_x = x + len_handlebar / 2 - FrameWide / 2;
-	init_y = y + FrameWide + LenRudder;
-	new_bike.wheel1 = new Ring(init_x, init_y, 0, WheelRad, FrameWide, black);
-	// колесо 2
-	init_x += FrameLen + FrameWide/2;
-	new_bike.wheel2 = new Ring(init_x, init_y, 0, WheelRad, FrameWide, black);
-} // CreateBike
-
-void ShowBike(Bike bike)
-{
-	bike.handlebar->Show();
-	bike.rudder_frame->Show();
-	bike.frame->Show();
-	bike.seat->Show();
-	bike.wheel1->Show();
-	bike.wheel2->Show();
-} // ShowBike
-
-void HideBike(Bike bike)
-{
-	bike.handlebar->Hide();
-	bike.rudder_frame->Hide();
-	bike.frame->Hide();
-	bike.seat->Hide();
-	bike.wheel1->Hide();
-	bike.wheel2->Hide();
-} // HideBike
-
-void MoveBikeTo(int len_handlebar, int LenRudder, int WheelRad, int FrameLen, int FrameHeight, int x, int y, Bike& new_bike)
-{
-	HideBike(new_bike);
-	CreateBike(len_handlebar, LenRudder, WheelRad, FrameLen, FrameHeight, x, y, new_bike);
-	ShowBike(new_bike);
-} // MoveBikeTo
-
-void DragBike(int delta, int len_handlebar, int LenRudder, int WheelRad, int FrameLen, int FrameHeight, int x, int y, Bike& new_bike)
-{
-	int dragX, dragY;
-	dragX = x;
-	dragY = y;
-	while (1)
-	{
-		if (KEY_DOWN(VK_ESCAPE)) break;
-		else if (KEY_DOWN(VK_UP))
-		{
-			dragY -= delta;
-			MoveBikeTo(len_handlebar, LenRudder, WheelRad, FrameLen, FrameHeight, dragX, dragY, new_bike);
-			Sleep(500);
-		} // else if
-		else if (KEY_DOWN(VK_DOWN))
-		{
-			dragY += delta;
-			MoveBikeTo(len_handlebar, LenRudder, WheelRad, FrameLen, FrameHeight, dragX, dragY, new_bike);
-			Sleep(500);
-		} // else if
-		else if (KEY_DOWN(VK_LEFT))
-		{
-			dragX -= delta;
-			MoveBikeTo(len_handlebar, LenRudder, WheelRad, FrameLen, FrameHeight, dragX, dragY, new_bike);
-			Sleep(500);
-		} // else if
-		else if (KEY_DOWN(VK_RIGHT))
-		{
-			dragX += delta;
-			MoveBikeTo(len_handlebar, LenRudder, WheelRad, FrameLen, FrameHeight, dragX, dragY, new_bike);
-			Sleep(500);
-		} // else if
-	} // while 1
-} // DragBike
-
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.

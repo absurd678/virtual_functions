@@ -11,11 +11,6 @@ extern HDC hdc;
 
 //------------------------------------------Point----------------------------------------------
 
-void Point::set_colorData(int* new_colorData)
-{
-	for (int i = 0; i < COLLEN; i++)
-		colorData[i] = new_colorData[i];
-} // set_colorData
 
 void Point::Move_to(int newX, int newY)
 {
@@ -34,7 +29,7 @@ void Point::Hide()
 void Point::Show()
 {
 	is_visible = 1;
-	SetPixel(hdc, x, y, RGB(colorData[0], colorData[1], colorData[2]));
+	SetPixel(hdc, x, y, RGB(255, 0, 0));
 } // Point::Show()
 
 void Point::Drag(int delta)
@@ -72,173 +67,281 @@ void Point::Drag(int delta)
 	} // while 1
 } // Point::Drag
 
-// --------------------------------------Circle----------------------------------------
 
-void Circle::Show() {
+//---------------------------------------Bicycle---------------------------------------
+Bicycle::Bicycle(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide):Point(init_x, init_y, init_visible)
+{
+	x = init_x;
+	y = init_y;
+	len_handlebar = in_len_handlebar;
+	LenRudder = inLenRudder;
+	WheelRad = inWheelRad;
+	FrameLen = inFrameLen;
+	FrameHeight = inFrameHeight;
+	FrameWide = inFrameWide;
+}//Bicycle
+
+void Bicycle::Show()
+{
+	int init_x, init_y, init_x1, init_y1;
 	is_visible = 1;
-	HPEN PenRed = CreatePen(PS_SOLID, 2, RGB(colorData[0], colorData[1], colorData[2]));
-	SelectObject(hdc, PenRed);
-	Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
-	DeleteObject(PenRed);
-} // Show
-
-void Circle::Hide()
-{
-	is_visible = 0;
-	HPEN PenRed = CreatePen(PS_SOLID, 2, RGB(255, 255, 255));
-	SelectObject(hdc, PenRed);
-	Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
-	DeleteObject(PenRed);
-} // Hide
-
-int Circle::Expand(int delta)
-{
-	if (delta < 0 && abs(delta) > radius) return 1;
-	radius += delta;
-	if (radius < 2) radius = 2;
-	Show();
-	return 0;
-} // Expand
-
-int Circle::Reduce(int delta)
-{
-	return Expand(-delta);
-} // Reduce
-
-
-//------------------------------------------- Ring---------------------------------------------------
-void Ring::Show()
-{
-	is_visible = 1;
-	HPEN PenRed = CreatePen(PS_SOLID, wide, RGB(colorData[0], colorData[1], colorData[2]));
-	SelectObject(hdc, PenRed);
-	Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
-	DeleteObject(PenRed);
-} // Show
-
-void Ring::Hide()
-{
-	is_visible = 0;
-	HPEN PenRed = CreatePen(PS_SOLID, wide, RGB(255, 255, 255));
-	SelectObject(hdc, PenRed);
-	Ellipse(hdc, x - radius, y - radius, x + radius, y + radius);
-	DeleteObject(PenRed);
-} // Hide
-
-int Ring::Wide(int DeltaWide)
-{
-	if (DeltaWide < 0 && abs(DeltaWide) > radius) return 1;
-	wide += DeltaWide;
-	if (wide < 2) wide = 2;
-	Show();
-	return 0;
-} // Wide
-
-int Ring::Slim(int DeltaWide)
-{
-	return Wide(-DeltaWide);
-} // Slim
-
-
-// -------------------------------------------Line---------------------------------------------------
-void Line::Show()
-{
-	is_visible = 1;
-	HPEN hPen = CreatePen(PS_SOLID, 1, RGB(colorData[0], colorData[1], colorData[2])); // Стандартный стиль, толщина 1 пиксель, красный цвет
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0)); // Стандартный стиль, толщина wide пиксель, красный цвет
 	SelectObject(hdc, hPen);
-
-	MoveToEx(hdc, x, y, NULL); // Начальная точка 
-	LineTo(hdc, x1, y1); // Конечная точка 
-
-	DeleteObject(hPen);
 	
-} // Show()
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide);
 
-void Line::Hide()
-{
-	is_visible = 0;
-	HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255)); // Стандартный стиль, толщина 1 пиксель, синий цвет
-	SelectObject(hdc, hPen);
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder);
 
-	MoveToEx(hdc, x, y, NULL); // Начальная точка 
-	LineTo(hdc, x1, y1); // Конечная точка 
+	init_x += FrameWide;
+	init_y = y + FrameWide + 0.3 * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 0.6 * LenRudder);
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight);
+
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	Ellipse(hdc, init_x-WheelRad, init_y- WheelRad, init_x + WheelRad, init_y + WheelRad);
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
 
 	DeleteObject(hPen);
-} // Hide
 
-void Line::Move_to(int newX, int newY, int newX1, int newY1)
+}
+
+void Bicycle::Hide()
 {
-	Hide();
-	x = newX; x1 = newX1;
-	y = newY; y1 = newY1;
-	Show();
-} // Line::Move_to
-
-void Line::Drag(int delta)
-{
-	int dragX, dragY, dragX1, dragY1;
-	dragX = x; dragX1 = x1;
-	dragY = y; dragY1 = y1;
-	while (1)
-	{
-		if (KEY_DOWN(VK_ESCAPE)) break;
-		else if (KEY_DOWN(VK_UP))
-		{
-			dragY -= delta;
-			dragY1 -= delta;
-			Move_to(dragX, dragY, dragX1, dragY1);
-			Sleep(500);
-		} // else if
-		else if (KEY_DOWN(VK_DOWN))
-		{
-			dragY += delta;
-			dragY1 += delta;
-			Move_to(dragX, dragY, dragX1, dragY1);
-			Sleep(500);
-		} // else if
-		else if (KEY_DOWN(VK_LEFT))
-		{
-			dragX -= delta;
-			dragX1 -= delta;
-			Move_to(dragX, dragY, dragX1, dragY1);
-			Sleep(500);
-		} // else if
-		else if (KEY_DOWN(VK_RIGHT))
-		{
-			dragX += delta;
-			dragX1 += delta;
-			Move_to(dragX, dragY, dragX1, dragY1);
-			Sleep(500);
-		} // else if
-	} // while 1
-} // Line::Drag
-
-
-// -------------------------------------------------------Rectangle-------------------------------------------------
-RectAngle::RectAngle(int init_x, int init_y, bool init_visibility, int init_x1, int init_y1, int init_wide, int* init_color) :Line(init_x, init_y, init_visibility, init_x1, init_y1, init_color)
-{
-	wide = init_wide;
-} // Rectangle
-
-void RectAngle::Show()
-{
+	int init_x, init_y, init_x1, init_y1;
 	is_visible = 1;
-	HPEN hPen = CreatePen(PS_SOLID, wide, RGB(colorData[0], colorData[1], colorData[2])); // Стандартный стиль, толщина wide пиксель, красный цвет
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 255, 255)); // Стандартный стиль, толщина wide пиксель, белый цвет
 	SelectObject(hdc, hPen);
 
-	Rectangle(hdc, x, y, x1, y1);
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide);
+
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder);
+
+	init_x += FrameWide;
+	init_y = y + FrameWide + 0.3 * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 0.6 * LenRudder);
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight);
+
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
 
 	DeleteObject(hPen);
-} // Show()
-void RectAngle::Hide()
+}
+
+
+//-----------------------------------Speed Bike---------------------------------------------
+
+SpeedBike::SpeedBike(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_speed) : Bicycle(init_x, init_y, 
+		in_len_handlebar, inLenRudder, init_visible, inWheelRad, inFrameLen, inFrameHeight, inFrameWide)
 {
-	is_visible = 0;
-	HPEN hPen = CreatePen(PS_SOLID, wide, RGB(255, 255, 255)); // Стандартный стиль, толщина wide пиксель, синий цвет
+	speed = init_speed;
+}
+
+void SpeedBike::Show()
+{
+	int init_x, init_y, init_x1, init_y1;
+	is_visible = 1;
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(0, 255, 0)); // Стандартный стиль, толщина wide пиксель, красный цвет
 	SelectObject(hdc, hPen);
 
-	Rectangle(hdc, x, y, x1, y1);
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide);
+
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder);
+
+	init_x += FrameWide;
+	init_y = y + FrameWide + 0.3 * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 0.6 * LenRudder);
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight);
+
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
 
 	DeleteObject(hPen);
-} // Hide
+
+}
 
 
+//---------------------------------Mount Bike---------------------------------------
+
+MountBike::MountBike(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_wheel_wide) : Bicycle(init_x, init_y,
+		in_len_handlebar, inLenRudder, init_visible, inWheelRad, inFrameLen, inFrameHeight, inFrameWide)
+{
+	wheel_wide = init_wheel_wide;
+}
+
+void MountBike::Show()
+{
+	int init_x, init_y, init_x1, init_y1;
+	is_visible = 1;
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0)); 
+	SelectObject(hdc, hPen);
+
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide);
+
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder);
+
+	init_x += FrameWide;
+	init_y = y + FrameWide + 0.3 * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 0.6 * LenRudder);
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight);
+	DeleteObject(hPen);
+
+	hPen = CreatePen(PS_SOLID, wheel_wide, RGB(0, 0, 0));
+	SelectObject(hdc, hPen);
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+
+	DeleteObject(hPen);
+}
+
+void MountBike::Hide()
+{
+	int init_x, init_y, init_x1, init_y1;
+	is_visible = 1;
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide);
+
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder);
+
+	init_x += FrameWide;
+	init_y = y + FrameWide + 0.3 * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 0.6 * LenRudder);
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight);
+	DeleteObject(hPen);
+
+	hPen = CreatePen(PS_SOLID, wheel_wide, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+
+	DeleteObject(hPen);
+}
+
+
+//----------------------------------------Damaged Bike-----------------------------------------------------
+
+DamagedBike::DamagedBike(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide) : Bicycle(init_x, init_y,
+		in_len_handlebar, inLenRudder, init_visible, inWheelRad, inFrameLen, inFrameHeight, inFrameWide) {}
+
+void DamagedBike::Show()
+{
+	int init_x, init_y, init_x1, init_y1;
+	is_visible = 1;
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(0, 0, 255)); 
+	SelectObject(hdc, hPen);
+
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide);
+
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder);
+
+	init_x += FrameWide;
+	init_y = y + FrameWide + 0.3 * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 0.6 * LenRudder);
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight);
+
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	//Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	Rectangle(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	//Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	Rectangle(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+
+	DeleteObject(hPen);
+
+}
+
+void DamagedBike::Hide()
+{
+	int init_x, init_y, init_x1, init_y1;
+	is_visible = 1;
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 255, 255));
+	SelectObject(hdc, hPen);
+
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide);
+
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder);
+
+	init_x += FrameWide;
+	init_y = y + FrameWide + 0.3 * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 0.6 * LenRudder);
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + 0.3 * FrameLen, init_y + 0.3 * FrameHeight);
+
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	//Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	Rectangle(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	//Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+	Rectangle(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
+
+	DeleteObject(hPen);
+}
