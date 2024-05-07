@@ -4,6 +4,8 @@ using namespace std;
 
 // КОНСТАНТЫ
 const int COLLEN = 3;
+extern const int AMOUNT;
+extern const int COORDINATES;
 
 // -----------------КЛАССЫ--------------------
 // -------------------------------------------
@@ -44,9 +46,32 @@ public:
 	bool get_visibility() { return is_visible; }
 	void set_visibility(bool new_visibility) { is_visible = new_visibility; }
 	
-	void Move_to(int newX, int newY);
-	void Drag(int delta); 
-	virtual void Show();
+	void Move_to(int newX, int newY, int coord_of_obstacles[][COORDINATES]);
+	void Drag(int delta, int coord_of_obstacles[][COORDINATES]);
+	virtual bool Show(int coord_of_obstacles[][COORDINATES]);
+	virtual void Hide();
+	/*void Show();
+	void Hide();*/
+}; // Point
+
+//--------------------------RectAngle------------------------------------------
+class RectAngle :public Point
+{
+protected:
+	int x1;
+	int y1;
+public:
+	RectAngle(int init_x1, int init_y1, int init_x, int init_y, bool init_visible) :Point(init_x, init_y, init_visible)
+	{
+		x1 = init_x1;
+		y1 = init_y1;
+	} // Point
+	~RectAngle() {}
+	// getters, setters
+	int get_x1() { return x1; }
+	int get_y1() { return y1; }
+
+	virtual bool Show();
 	virtual void Hide();
 	/*void Show();
 	void Hide();*/
@@ -69,8 +94,15 @@ public:
 
 	//void Move_to(int newX, int newY); // В случае статики возникает дублирование кода
 	//void Drag(int delta); // тож самое
-	virtual void Show();
+	virtual bool Show(int coord_of_obstacles[][COORDINATES]);
 	virtual void Hide();
+	// Геттеры для всех новых полей
+	int get_handlebar() { return len_handlebar;}
+	int get_rudder() { return LenRudder; }
+	int get_wheelrad() { return WheelRad; }
+	int get_framelen() { return FrameLen; }
+	int get_frameheight(){ return FrameHeight; }
+	int get_framewide() { return FrameWide; }
 }; // Point
 
 //--------------------------Speed Bike-----------------------------------------
@@ -83,7 +115,7 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_speed);
 	~SpeedBike(){}
 
-	virtual void Show();
+	virtual bool Show();
 	int get_speed() { return speed; }
 };
 
@@ -98,7 +130,7 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_wheel_wide);
 	~MountBike() {}
 
-	virtual void Show();
+	virtual bool Show();
 	virtual void Hide();
 };
 
@@ -111,9 +143,9 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide);
 	~DamagedBike() {}
 
-	virtual void Show();
+	virtual bool Show();
 	virtual void Hide();
 };
 
-
+bool check_collision(int coord_of_obstacles[][COORDINATES], int x, int y, int x1, int y1);
 
