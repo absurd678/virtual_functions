@@ -4,7 +4,7 @@ using namespace std;
 
 // КОНСТАНТЫ
 const int COLLEN = 3;
-
+const int SPEED = 25; // константная скорость
 
 // -----------------КЛАССЫ--------------------
 // -------------------------------------------
@@ -46,8 +46,8 @@ public:
 	bool get_visibility() { return is_visible; }
 	void set_visibility(bool new_visibility) { is_visible = new_visibility; }
 	
-	void Move_to(int newX, int newY, int** coord_of_obstacles);
-	void Drag(int delta, int** coord_of_obstacles);
+	bool Move_to(int newX, int newY, int** coord_of_obstacles);
+	bool Drag(int delta, int** coord_of_obstacles);
 	virtual bool Show(int** coord_of_obstacles);
 	virtual void Hide();
 	/*void Show();
@@ -140,6 +140,7 @@ public:
 	int get_framelen() { return FrameLen; }
 	int get_frameheight(){ return FrameHeight; }
 	int get_framewide() { return FrameWide; }
+	int get_speed() { return SPEED; }
 }; // Point
 
 //--------------------------Speed Bike-----------------------------------------
@@ -153,7 +154,7 @@ public:
 	~SpeedBike(){}
 
 	virtual bool Show(int** coord_of_obstacles);
-	int get_speed() { return speed; }
+	int get_speed() { return speed; } // Скорость теперь можно менять
 };
 
 

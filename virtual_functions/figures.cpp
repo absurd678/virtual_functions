@@ -8,28 +8,6 @@ const float COEFF = 0.3;
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 
 
-//----------------------------------‘”Ќ ÷»»--------------------------------------
-
-bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1)
-{
-	for (int i = 0; i < AMOUNT; i++)
-	{
-		if (x == coord_of_obstacles[i][2] || x1 == coord_of_obstacles[i][0]) // ¬ъехали справа или слева
-		{
-			if (y <= coord_of_obstacles[i][1] && y >= coord_of_obstacles[i][3]) return 1; // въехали верхним углом
-			if (y1 <= coord_of_obstacles[i][1] && y1 >= coord_of_obstacles[i][3]) return 1; // въехали нижним углом
-			if (coord_of_obstacles[i][1] < y && coord_of_obstacles[i][3] > y1) return 1; // преп€тствие меньше велика
-		} // if
-		if (y1 == coord_of_obstacles[i][1] || y == coord_of_obstacles[i][3]) // ¬ъехали сверху или снизу
-		{
-			if (x1 <= coord_of_obstacles[i][2] && x1 >= coord_of_obstacles[i][0]) return 1; // въехали левым углом
-			if (x <= coord_of_obstacles[i][2] && x >= coord_of_obstacles[i][0]) return 1; // въехали правым углом
-			if (coord_of_obstacles[i][0] < x1 && coord_of_obstacles[i][2] > x) return 1; // преп€тствие меньше велика
-		} // if
-	} // for i
-	return 0;
-}
-
 
 // ---------------------------------------- Ћј——џ----------------------------------------------
 // --------------------------------------------------------------------------------------------
@@ -37,13 +15,13 @@ bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1)
 //------------------------------------------Point----------------------------------------------
 
 
-void Point::Move_to(int newX, int newY, int** coord_of_obstacles)
+bool Point::Move_to(int newX, int newY, int** coord_of_obstacles)
 {
 	Hide();
 	x = newX;
 	y = newY;
 	bool is_collision = Show(coord_of_obstacles);
-	if (is_collision) cout << "the collision was caught" << endl;
+	return is_collision;
 } // Point::Move_to
 
 void Point::Hide()
@@ -59,39 +37,42 @@ bool Point::Show(int** coord_of_obstacles)
 	return 0;
 } // Point::Show()
 
-void Point::Drag(int delta, int** coord_of_obstacles)
+bool Point::Drag(int delta, int** coord_of_obstacles)
 {
 	int dragX, dragY;
 	dragX = x;
 	dragY = y;
-	while (1)
+	bool is_collision = 0;
+
+	while (!is_collision)
 	{
-		if (KEY_DOWN(VK_ESCAPE)) break;
+		if (KEY_DOWN(VK_ESCAPE)) return 0;
 		else if (KEY_DOWN(VK_UP))
 		{
 			dragY -= delta;
-			Move_to(dragX, dragY, coord_of_obstacles);
-			Sleep(500);
+			is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+			Sleep(250);
 		} // else if
 		else if (KEY_DOWN(VK_DOWN))
 		{
 			dragY += delta;
-			Move_to(dragX, dragY, coord_of_obstacles);
-			Sleep(500);
+			is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+			Sleep(250);
 		} // else if
 		else if (KEY_DOWN(VK_LEFT))
 		{
 			dragX -= delta;
-			Move_to(dragX, dragY, coord_of_obstacles);
-			Sleep(500);
+			is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+			Sleep(250);
 		} // else if
 		else if (KEY_DOWN(VK_RIGHT))
 {
 			dragX += delta;
-			Move_to(dragX, dragY, coord_of_obstacles);
-			Sleep(500);
+			is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+			Sleep(250);
 		} // else if
-	} // while 1
+	} // while 
+	return 1;
 } // Point::Drag
 
 //------------------------------------------ѕ–≈ѕя“—“¬»я--------------------------------------
@@ -504,20 +485,20 @@ bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1)
 {
 	for (int i = 0; i < sizeof(coord_of_obstacles)/sizeof(int); i++)
 	{
-		if ((x <= coord_of_obstacles[i][2] && x >= coord_of_obstacles[i][0]) || (x1 >= coord_of_obstacles[i][0] && x1 <= coord_of_obstacles[i][2])) // столкновение справа или слева
+		if ((x < coord_of_obstacles[i][2] && x > coord_of_obstacles[i][0]) || (x1 > coord_of_obstacles[i][0] && x1 < coord_of_obstacles[i][2])) // столкновение справа или слева
 		{
-			if (y <= coord_of_obstacles[i][1] && y >= coord_of_obstacles[i][3]) 
+			if (y > coord_of_obstacles[i][1] && y < coord_of_obstacles[i][3]) 
 				return 1; // рулем
-			if (y1 <= coord_of_obstacles[i][1] && y1 >= coord_of_obstacles[i][3]) 
+			if (y1 > coord_of_obstacles[i][1] && y1 < coord_of_obstacles[i][3]) 
 				return 1;  // колесом
-			if (coord_of_obstacles[i][1] < y && coord_of_obstacles[i][3] > y1) 
+			if (coord_of_obstacles[i][1] > y && coord_of_obstacles[i][3] < y1) 
 				return 1;  // преп€тствие "вошло" в велик
 		} // if
-		if ((y >= coord_of_obstacles[i][3] && y <= coord_of_obstacles[i][1]) || (y1 <= coord_of_obstacles[i][1] && y1 >= coord_of_obstacles[i][3])) // столкновение снизу или сверху
+		if ((y < coord_of_obstacles[i][3] && y > coord_of_obstacles[i][1]) || (y1 > coord_of_obstacles[i][1] && y1 < coord_of_obstacles[i][3])) // столкновение снизу или сверху
 		{
-			if (x <= coord_of_obstacles[i][2] && x >= coord_of_obstacles[i][0]) 
+			if (x < coord_of_obstacles[i][2] && x > coord_of_obstacles[i][0]) 
 				return 1; // левым углом
-			if (x1 <= coord_of_obstacles[i][2] && x1 >= coord_of_obstacles[i][0])
+			if (x1 < coord_of_obstacles[i][2] && x1 > coord_of_obstacles[i][0])
 				return 1;  // правым 
 			if (coord_of_obstacles[i][0] > x && coord_of_obstacles[i][2] < x1)
 				return 1; // преп€тствие "вошло" в велик
