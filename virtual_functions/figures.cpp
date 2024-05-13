@@ -7,6 +7,30 @@ extern HDC hdc;
 const float COEFF = 0.3;
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 
+
+//----------------------------------ФУНКЦИИ--------------------------------------
+
+bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1)
+{
+	for (int i = 0; i < AMOUNT; i++)
+	{
+		if (x == coord_of_obstacles[i][2] || x1 == coord_of_obstacles[i][0]) // Въехали справа или слева
+		{
+			if (y <= coord_of_obstacles[i][1] && y >= coord_of_obstacles[i][3]) return 1; // въехали верхним углом
+			if (y1 <= coord_of_obstacles[i][1] && y1 >= coord_of_obstacles[i][3]) return 1; // въехали нижним углом
+			if (coord_of_obstacles[i][1] < y && coord_of_obstacles[i][3] > y1) return 1; // препятствие меньше велика
+		} // if
+		if (y1 == coord_of_obstacles[i][1] || y == coord_of_obstacles[i][3]) // Въехали сверху или снизу
+		{
+			if (x1 <= coord_of_obstacles[i][2] && x1 >= coord_of_obstacles[i][0]) return 1; // въехали левым углом
+			if (x <= coord_of_obstacles[i][2] && x >= coord_of_obstacles[i][0]) return 1; // въехали правым углом
+			if (coord_of_obstacles[i][0] < x1 && coord_of_obstacles[i][2] > x) return 1; // препятствие меньше велика
+		} // if
+	} // for i
+	return 0;
+}
+
+
 // ----------------------------------------КЛАССЫ----------------------------------------------
 // --------------------------------------------------------------------------------------------
 
@@ -231,7 +255,7 @@ bool Bicycle::Show(int** coord_of_obstacles)
 	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad); // Левое колесо
 	// колесо 2
 	init_x += FrameLen + FrameWide / 2;
-	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad); // Правое колесо
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad); // Правое колесо 
 
 	DeleteObject(hPen);
 	// Описываем велик прямоугольником; зная, что левый верхний угол - координаты руля, а нижний правый - координаты правого колеса, передаем в коллизию
@@ -475,8 +499,6 @@ void DamagedBike::Hide()
 	DeleteObject(hPen);
 }
 
-
-//----------------------------------ФУНКЦИИ--------------------------------------
 
 bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1)
 {
