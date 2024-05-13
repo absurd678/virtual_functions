@@ -4,8 +4,7 @@ using namespace std;
 
 // КОНСТАНТЫ
 const int COLLEN = 3;
-extern const int AMOUNT;
-extern const int COORDINATES;
+
 
 // -----------------КЛАССЫ--------------------
 // -------------------------------------------
@@ -31,6 +30,7 @@ public:
 
 }; // Location
 
+//-----------------------------------ОБЩИЙ РОДИТЕЛЬ---------------------------------
 //--------------------------Point------------------------------------------
 class Point :public Location
 {
@@ -46,36 +46,73 @@ public:
 	bool get_visibility() { return is_visible; }
 	void set_visibility(bool new_visibility) { is_visible = new_visibility; }
 	
-	void Move_to(int newX, int newY, int coord_of_obstacles[][COORDINATES]);
-	void Drag(int delta, int coord_of_obstacles[][COORDINATES]);
-	virtual bool Show(int coord_of_obstacles[][COORDINATES]);
+	void Move_to(int newX, int newY, int** coord_of_obstacles);
+	void Drag(int delta, int** coord_of_obstacles);
+	virtual bool Show(int** coord_of_obstacles);
 	virtual void Hide();
 	/*void Show();
 	void Hide();*/
 }; // Point
 
-//--------------------------RectAngle------------------------------------------
-class RectAngle :public Point
+//------------------------------------------ПРЕПЯТСТВИЯ--------------------------------------
+//--------------------------Simple_obstacle------------------------------------------
+class Simple_obstacle :public Point
 {
 protected:
 	int x1;
 	int y1;
 public:
-	RectAngle(int init_x1, int init_y1, int init_x, int init_y, bool init_visible) :Point(init_x, init_y, init_visible)
+	Simple_obstacle(int init_x, int init_y, int init_x1, int init_y1, bool init_visible) :Point(init_x, init_y, init_visible)
 	{
 		x1 = init_x1;
 		y1 = init_y1;
 	} // Point
-	~RectAngle() {}
+	~Simple_obstacle() {}
 	// getters, setters
 	int get_x1() { return x1; }
 	int get_y1() { return y1; }
 
 	virtual bool Show();
 	virtual void Hide();
-	/*void Show();
-	void Hide();*/
 }; // Point
+
+//--------------------Box-------------------
+class Box :public Simple_obstacle
+{
+protected:
+	int R, G, B;
+public:
+	Box(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_R = 63, int init_G = 161, int init_B = 119);
+	~Box() {}
+
+	virtual bool Show();
+	virtual void Hide();
+};
+
+//----------------------Tree----------------------
+class Tree :public Simple_obstacle
+{
+protected:
+	int season;
+public:
+	Tree(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_season);
+	~Tree() {}
+
+	virtual bool Show();
+	virtual void Hide();
+};
+
+//-------------------Speed Bump----------------------------
+class Speed_bump :public Simple_obstacle
+{
+public:
+	Speed_bump(int init_x, int init_y, int init_x1, int init_y1, bool init_visible) :
+		Simple_obstacle(init_x, init_y, init_x1, init_y1, init_visible) {}
+	~Speed_bump() {}
+
+	virtual bool Show();
+	virtual void Hide();
+};
 
 //--------------------------Bicycle------------------------------------------
 class Bicycle :public Point
@@ -94,7 +131,7 @@ public:
 
 	//void Move_to(int newX, int newY); // В случае статики возникает дублирование кода
 	//void Drag(int delta); // тож самое
-	virtual bool Show(int coord_of_obstacles[][COORDINATES]);
+	virtual bool Show(int** coord_of_obstacles);
 	virtual void Hide();
 	// Геттеры для всех новых полей
 	int get_handlebar() { return len_handlebar;}
@@ -115,7 +152,7 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_speed);
 	~SpeedBike(){}
 
-	virtual bool Show();
+	virtual bool Show(int** coord_of_obstacles);
 	int get_speed() { return speed; }
 };
 
@@ -130,7 +167,7 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_wheel_wide);
 	~MountBike() {}
 
-	virtual bool Show();
+	virtual bool Show(int** coord_of_obstacles);
 	virtual void Hide();
 };
 
@@ -143,9 +180,9 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide);
 	~DamagedBike() {}
 
-	virtual bool Show();
+	virtual bool Show(int** coord_of_obstacles);
 	virtual void Hide();
 };
 
-bool check_collision(int coord_of_obstacles[][COORDINATES], int x, int y, int x1, int y1);
+bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1);
 

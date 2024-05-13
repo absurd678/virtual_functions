@@ -21,6 +21,9 @@ using namespace std;
 #include "figures.h"
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 
+//----------------------------КОНСТАНТЫ-----------------------------------
+const int AMOUNT = 2;
+const int COORDINATES = 4;
 
 //----------------------------ПЕРЕМЕННЫЕ-----------------------------------
 HDC hdc;
@@ -32,18 +35,6 @@ HDC hdc;
 int main()
 {
     hdc = GetDC(GetConsoleWindow()); // Получаем контекст устройства консоли
-
-	//-----------------------------ЛАБА 2--------------------------------------------
-	//// Статические VS Виртуальные методы
-	//Point rect1 = Point(50, 50, 0);
-	//rect1.Show();
-	//cin.get();
-	//rect1.Hide();
-	//cin.get();
-	//rect1.Move_to(100, 100);  // Сравнить два связывания 
-	//cin.get();
-	//rect1.Drag(50);
-	//cin.get();
 	
 
 	// Велосипед
@@ -53,80 +44,33 @@ int main()
 	int WheelRad = 40;  // Радиус колес
 	int FrameLen = 100;  // Длина рамы
 	int FrameHeight = 50;  // Высота рамы
-	int x = 400; int y = 400;  // Координаты велосипеда (определяют координаты руля!)
+	int x = 600; int y = 400;  // Координаты велосипеда (определяют координаты руля!)
 
 	// Bicycle
-	Bicycle bike = Bicycle(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10);
-	//bike.Show();
-	//cin.get();
-	//bike.Hide();
-	//cin.get();
-	//bike.Move_to(x+50, y+50);
-	//cin.get();
-	//bike.Drag(50); // esc
-	//cin.get();
-	
-	////Speed
-	//SpeedBike sp_bike = SpeedBike(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 80);
-	//sp_bike.Show();
-	//cin.get();
-	//sp_bike.Hide();
-	//cin.get();
-	//sp_bike.Move_to(x + 50, y + 50);
-	//cin.get();
-	//sp_bike.Drag(sp_bike.get_speed()); // esc
-	//cin.get();
-	//sp_bike.Hide();
-
-	////Mount
-	//MountBike mon_bike = MountBike(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 5);
-	//mon_bike.Show();
-	//cin.get();
-	//mon_bike.Hide();
-	//cin.get();
-	//mon_bike.Move_to(x + 50, y + 50);
-	//cin.get();
-	//mon_bike.Drag(10); // esc
-	//cin.get();
-	//mon_bike.Hide();
-
-
-	////Damaged
-	//DamagedBike dam_bike = DamagedBike(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10);
-	//dam_bike.Show();
-	//cin.get();
-	//dam_bike.Hide();
-	//cin.get();
-	//dam_bike.Move_to(x + 50, y + 50);
-	//cin.get();
-	//dam_bike.Drag(10); // esc
-	//cin.get();
-	//dam_bike.Hide();
+	SpeedBike bike = SpeedBike(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 25);
 
 	//------------------------------------ЛАБА 3----------------------------------
 	
-	RectAngle obstacle1(50, 50, 0, 0, 0);
-	RectAngle obstacle2(100, 100, 50, 50, 0);
-	RectAngle obstacle3(150, 150, 100, 100, 0);
-	RectAngle obstacle4(200, 200, 150, 150, 0);
-	RectAngle* obst_matr_p[AMOUNT] = { &obstacle1, &obstacle2, &obstacle3, &obstacle4 };
-	int obstacle_matr[AMOUNT][COORDINATES];
+	Box obstacle1(0, 0, 100, 100, 0);
+	/*Tree obstacle2(200, 200, 300, 600, 0, 0);
+	Speed_bump obstacle3(250, 250, 300, 300, 0);*/
+	Simple_obstacle obstacle4(300, 300, 500, 500, 0);
+	Simple_obstacle* obctacle_objects[AMOUNT] = { &obstacle1, &obstacle4 };
+	int** obstacle_matr = new int*[AMOUNT];
 	
 	for (int i = 0; i < AMOUNT; i++)
 	{
-		obst_matr_p[i]->Show();
-		obstacle_matr[i][0] = obst_matr_p[i]->get_x();
-		obstacle_matr[i][1] = obst_matr_p[i]->get_y();
-		obstacle_matr[i][2] = obst_matr_p[i]->get_x1();
-		obstacle_matr[i][3] = obst_matr_p[i]->get_y1();
+		obctacle_objects[i]->Show();
+		obstacle_matr[i] = new int[COORDINATES];
+		obstacle_matr[i][0] = obctacle_objects[i]->get_x();
+		obstacle_matr[i][1] = obctacle_objects[i]->get_y();
+		obstacle_matr[i][2] = obctacle_objects[i]->get_x1();
+		obstacle_matr[i][3] = obctacle_objects[i]->get_y1();
 	}
 	bike.Show(obstacle_matr);
 	cin.get();
-	//bike.Hide();
-	//cin.get();
-	//bike.Move_to(x+50, y+50);
-	//cin.get();
-	bike.Drag(50, obstacle_matr); // esc
+	
+	bike.Drag(25, obstacle_matr); // esc
 	cin.get();
 
     ReleaseDC(GetConsoleWindow(), hdc); // Освобождаем контекст устройства после использования
