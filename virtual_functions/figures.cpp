@@ -15,7 +15,7 @@ const float COEFF = 0.3;
 //------------------------------------------Point----------------------------------------------
 
 
-bool Point::Move_to(int newX, int newY, int** coord_of_obstacles)
+bool Point::Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles)
 {
 	Hide();
 	x = newX;
@@ -30,14 +30,14 @@ void Point::Hide()
 	SetPixel(hdc, x, y, RGB(255, 255, 255)); // Белый
 } // Point::Hide()
 
-bool Point::Show(int** coord_of_obstacles)
+bool Point::Show(vector<vector<int>> coord_of_obstacles)
 {
 	is_visible = 1;
 	SetPixel(hdc, x, y, RGB(255, 0, 0));
 	return 0;
 } // Point::Show()
 
-bool Point::Drag(int delta, int** coord_of_obstacles)
+bool Point::Drag(int delta, vector<vector<int>> coord_of_obstacles)
 {
 	int dragX, dragY;
 	dragX = x;
@@ -75,7 +75,7 @@ bool Point::Drag(int delta, int** coord_of_obstacles)
 	return 1;
 } // Point::Drag
 
-bool Point::Drag_and_leave(int delta, int** coord_of_obstacles) // 
+bool Point::Drag_and_leave(int delta, vector<vector<int>> coord_of_obstacles) // 
 {
 	int dragX, dragY;
 	dragX = x;
@@ -246,7 +246,7 @@ Bicycle::Bicycle(int init_x, int init_y, int in_len_handlebar, int inLenRudder, 
 	FrameWide = inFrameWide;
 }//Bicycle
 
-bool Bicycle::Show(int** coord_of_obstacles)
+bool Bicycle::Show(vector<vector<int>> coord_of_obstacles)
 {
 	int init_x, init_y, init_x1, init_y1;
 	bool is_collision = 0;
@@ -324,7 +324,7 @@ SpeedBike::SpeedBike(int init_x, int init_y, int in_len_handlebar, int inLenRudd
 	speed = init_speed;
 }
 
-bool SpeedBike::Show(int** coord_of_obstacles)
+bool SpeedBike::Show(vector<vector<int>> coord_of_obstacles)
 {
 	int init_x, init_y, init_x1, init_y1;
 	int is_collision;
@@ -369,7 +369,7 @@ MountBike::MountBike(int init_x, int init_y, int in_len_handlebar, int inLenRudd
 	wheel_wide = init_wheel_wide;
 }
 
-bool MountBike::Show(int** coord_of_obstacles)
+bool MountBike::Show(vector<vector<int>> coord_of_obstacles)
 {
 	int init_x, init_y, init_x1, init_y1;
 	int is_collision;
@@ -447,7 +447,7 @@ DamagedBike::DamagedBike(int init_x, int init_y, int in_len_handlebar, int inLen
 	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide) : Bicycle(init_x, init_y,
 		in_len_handlebar, inLenRudder, init_visible, inWheelRad, inFrameLen, inFrameHeight, inFrameWide) {}
 
-bool DamagedBike::Show(int** coord_of_obstacles)
+bool DamagedBike::Show(vector<vector<int>> coord_of_obstacles)
 {
 	int init_x, init_y, init_x1, init_y1;
 	int is_collision;
@@ -517,9 +517,9 @@ void DamagedBike::Hide()
 }
 
 
-bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1)
+bool check_collision(vector<vector<int>> coord_of_obstacles, int x, int y, int x1, int y1)
 {
-	for (int i = 0; i < sizeof(coord_of_obstacles)/sizeof(int); i++)
+	for (int i = 0; i < coord_of_obstacles.size(); i++)
 	{
 		if ((x < coord_of_obstacles[i][2] && x > coord_of_obstacles[i][0]) || (x1 > coord_of_obstacles[i][0] && x1 < coord_of_obstacles[i][2])) // столкновение справа или слева
 		{

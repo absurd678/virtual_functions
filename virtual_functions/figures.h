@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 using namespace std;
 
 // КОНСТАНТЫ
@@ -46,10 +47,10 @@ public:
 	bool get_visibility() { return is_visible; }
 	void set_visibility(bool new_visibility) { is_visible = new_visibility; }
 	
-	bool Move_to(int newX, int newY, int** coord_of_obstacles);
-	bool Drag(int delta, int** coord_of_obstacles);
-	bool Drag_and_leave(int delta, int** coord_of_obstacles); // как драг, только без вайла
-	virtual bool Show(int** coord_of_obstacles);
+	bool Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles);
+	bool Drag(int delta, vector<vector<int>> coord_of_obstacles);
+	bool Drag_and_leave(int delta, vector<vector<int>> coord_of_obstacles); // как драг, только без вайла
+	virtual bool Show(vector<vector<int>> coord_of_obstacles);
 	virtual void Hide();
 	/*void Show();
 	void Hide();*/
@@ -132,7 +133,7 @@ public:
 
 	//void Move_to(int newX, int newY); // В случае статики возникает дублирование кода
 	//void Drag(int delta); // тож самое
-	virtual bool Show(int** coord_of_obstacles);
+	virtual bool Show(vector<vector<int>> coord_of_obstacles);
 	virtual void Hide();
 	// Геттеры для всех новых полей
 	int get_handlebar() { return len_handlebar;}
@@ -154,7 +155,7 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_speed);
 	~SpeedBike(){}
 
-	virtual bool Show(int** coord_of_obstacles);
+	virtual bool Show(vector<vector<int>> coord_of_obstacles);
 	int get_speed() { return speed; } // Скорость теперь можно менять
 };
 
@@ -169,7 +170,7 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_wheel_wide);
 	~MountBike() {}
 
-	virtual bool Show(int** coord_of_obstacles);
+	virtual bool Show(vector<vector<int>> coord_of_obstacles);
 	virtual void Hide();
 };
 
@@ -182,9 +183,9 @@ public:
 		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide);
 	~DamagedBike() {}
 
-	virtual bool Show(int** coord_of_obstacles);
+	virtual bool Show(vector<vector<int>> coord_of_obstacles);
 	virtual void Hide();
 };
 
-bool check_collision(int** coord_of_obstacles, int x, int y, int x1, int y1);
+bool check_collision(vector<vector<int>> coord_of_obstacles, int x, int y, int x1, int y1);
 

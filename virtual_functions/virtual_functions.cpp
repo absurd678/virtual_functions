@@ -11,7 +11,7 @@
 *Programmers  :Кожевников Артем Вадимович,  М3О-209Б-22                            *
 *Modified By  :                                                                    *
 *Created      :10.04.2024                                                          *
-*Last revision:17.04.2024                                                          *
+*Last revision:14.05.2024                                                          *
 *Comment      :                                                                    *
 ***********************************************************************************/
 
@@ -27,7 +27,7 @@ using namespace std;
 
 //----------------------------ПЕРЕМЕННЫЕ-----------------------------------
 HDC hdc;
-int amount = 3; // количество препятствий
+int amount = 4; // количество препятствий
 int coordinates = 4; // количество координат для препятствия
 
 // Велосипед
@@ -43,7 +43,8 @@ Bicycle* pbike;
 
 
 //---------------------------ПРОТОТИПЫ ФУНКЦИЙ-------------------------------
-void play(Bicycle* pBike, int** all_obstacles, Simple_obstacle** all_pObstacles, int obstacles_amount, int coord_amount, int startx, int starty);
+void play(Bicycle* pBike, vector<vector<int>> all_obstacles, Simple_obstacle** all_pObstacles,
+	int obstacles_amount, int coord_amount, int startx, int starty);
 
 
 //----------------------------ОСНОВНАЯ ПРОГРАММА-------------------------------------
@@ -61,12 +62,14 @@ int main()
 	Box obstacle1(500, 100, 530, 130, 0); // коробка 30х30
 	Tree obstacle2(20, 20, 70, 90, 0, 0); // дерево 50х70
 	Speed_bump obstacle3(20, 500, 90, 520, 0); // лежачий полицейский 70х20
-	Simple_obstacle** obstacle_objects = new Simple_obstacle * [amount] { &obstacle1, &obstacle2, &obstacle3 };
-	int** obstacle_matr = new int*[amount];
+	Simple_obstacle obstacle4(500, 300, 530, 330, 0); // просто препятствие 30x30
+	Simple_obstacle** obstacle_objects = new Simple_obstacle * [amount] { &obstacle1, &obstacle2, &obstacle3, &obstacle4 }; // массив указателей на препятствия
+	vector<vector<int>> obstacle_matr(amount, vector<int>(coordinates, 0));
+	//int** obstacle_matr = new int*[amount];
 	
 	for (int i = 0; i < amount; i++)
 	{
-		obstacle_matr[i] = new int[coordinates];
+		//obstacle_matr[i] = new int[coordinates];
 		obstacle_matr[i][0] = obstacle_objects[i]->get_x();
 		obstacle_matr[i][1] = obstacle_objects[i]->get_y();
 		obstacle_matr[i][2] = obstacle_objects[i]->get_x1();
@@ -78,7 +81,8 @@ int main()
     ReleaseDC(GetConsoleWindow(), hdc); // Освобождаем контекст устройства после использования
 } // main
 
-void play(Bicycle* pBike, int** all_obstacles, Simple_obstacle** all_pObstacles, int obstacles_amount, int coord_amount, int startx, int starty)
+void play(Bicycle* pBike, vector<vector<int>> all_obstacles, Simple_obstacle** all_pObstacles, 
+	int obstacles_amount, int coord_amount, int startx, int starty)
 {
 	// ПЕРЕМЕННЫЕ
 	bool is_collision = 0; // столкнулись ли
@@ -97,11 +101,11 @@ void play(Bicycle* pBike, int** all_obstacles, Simple_obstacle** all_pObstacles,
 		if (is_collision)
 		{ // После аварии велик становится сломанным и возвращается в исходное положение
 			pBike->Hide();
-			DamagedBike bike(startx, starty, pBike->get_handlebar(), pBike->get_rudder(),
+			DamagedBike* damagedBike = new DamagedBike(startx, starty, pBike->get_handlebar(), pBike->get_rudder(),
 				pBike->get_visibility(), pBike->get_wheelrad(), pBike->get_framelen(),
 				pBike->get_frameheight(), pBike->get_framewide());
-			delete pBike;
-			pBike = &bike;
+			//delete pBike; // Удаляем старый объект SpeedBike
+			pBike = damagedBike; // Присваиваем указателю новый объект DamagedBike
 			pBike->Show(all_obstacles);
 			is_damaged = 1;
 			is_collision = 0;
