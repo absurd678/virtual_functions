@@ -48,6 +48,7 @@ public:
 	
 	bool Move_to(int newX, int newY, int** coord_of_obstacles);
 	bool Drag(int delta, int** coord_of_obstacles);
+	bool Drag_and_leave(int delta, int** coord_of_obstacles); // как драг, только без вайла
 	virtual bool Show(int** coord_of_obstacles);
 	virtual void Hide();
 	/*void Show();

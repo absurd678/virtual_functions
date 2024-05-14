@@ -75,6 +75,44 @@ bool Point::Drag(int delta, int** coord_of_obstacles)
 	return 1;
 } // Point::Drag
 
+bool Point::Drag_and_leave(int delta, int** coord_of_obstacles) // 
+{
+	int dragX, dragY;
+	dragX = x;
+	dragY = y;
+	bool is_collision = 0;
+
+	
+	if (KEY_DOWN(VK_ESCAPE)) return 0;
+	else if (KEY_DOWN(VK_UP))
+	{
+		dragY -= delta;
+		is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+		Sleep(250);
+	} // else if
+	else if (KEY_DOWN(VK_DOWN))
+	{
+		dragY += delta;
+		is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+		Sleep(250);
+	} // else if
+	else if (KEY_DOWN(VK_LEFT))
+	{
+		dragX -= delta;
+		is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+		Sleep(250);
+	} // else if
+	else if (KEY_DOWN(VK_RIGHT))
+	{
+		dragX += delta;
+		is_collision = Move_to(dragX, dragY, coord_of_obstacles);
+		Sleep(250);
+	} // else if
+	 
+	if(is_collision) return 1;
+	return 0;
+}
+
 //------------------------------------------ÏÐÅÏßÒÑÒÂÈß--------------------------------------
 //--------------------------Simple_obstacle------------------------------------------
 bool Simple_obstacle::Show()
@@ -434,11 +472,9 @@ bool DamagedBike::Show(int** coord_of_obstacles)
 	// êîëåñî 1
 	init_x = x + len_handlebar / 2 - FrameWide / 2;
 	init_y = y + FrameWide + LenRudder;
-	//Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
 	Rectangle(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
 	// êîëåñî 2
 	init_x += FrameLen + FrameWide / 2;
-	//Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
 	Rectangle(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad);
 
 	DeleteObject(hPen);
