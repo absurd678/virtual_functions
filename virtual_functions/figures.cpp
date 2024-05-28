@@ -17,6 +17,14 @@ const float COEFF = 0.3;
 //------------------------------------------ÏÐÅÏßÒÑÒÂÈß--------------------------------------
 //--------------------------ABC_obstacle------------------------------------------
 
+ABC_obstacle::ABC_obstacle(int init_x, int init_y, int init_x1, int init_y1, bool init_visible) 
+	:IPoint(init_x, init_y)
+{
+	x1 = init_x1;
+	y1 = init_y1;
+	is_visible = init_visible;
+}
+
 bool ABC_obstacle::Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles)
 {
 	Hide();
@@ -63,13 +71,9 @@ bool ABC_obstacle::Drag(int delta, vector<vector<int>> coord_of_obstacles)
 }
 
 //----------------------------------Box----------------------------------------------
-Box::Box(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_R, int init_G, int init_B)
+Box::Box(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_R, int init_G, int init_B):
+	ABC_obstacle(init_x, init_y, init_x1, init_y1, init_visible)
 {
-	x = init_x;
-	y = init_y;
-	x1 = init_x1;
-	y1 = init_y1;
-	is_visible = init_visible;
 	R = init_R; 
 	G = init_G;
 	B = init_B;
@@ -95,13 +99,9 @@ void Box::Hide()
 
 
 //--------------------------------------Tree--------------------------------------------
-Tree::Tree(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_season)
+Tree::Tree(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_season):
+	ABC_obstacle(init_x, init_y, init_x1, init_y1, init_visible)
 {
-	x = init_x;
-	y = init_y;
-	x1 = init_x1;
-	y1 = init_y1;
-	is_visible = init_visible;
 	season = init_season;
 }
 
@@ -138,14 +138,9 @@ void Tree::Hide()
 }
 
 //---------------------------------------Speed Bump--------------------------------------
-Speed_bump::Speed_bump(int init_x, int init_y, int init_x1, int init_y1, bool init_visible)
-{
-	x = init_x;
-	y = init_y;
-	x1 = init_x1;
-	y1 = init_y1;
-	is_visible = init_visible;
-}
+Speed_bump::Speed_bump(int init_x, int init_y, int init_x1, int init_y1, bool init_visible):
+	ABC_obstacle(init_x, init_y, init_x1, init_y1, init_visible)
+{}
 void Speed_bump::Show()
 {
 	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
@@ -169,6 +164,19 @@ void Speed_bump::Hide()
 //---------------------------------------ABC_Bicycle---------------------------------------
 
 //------------------Èíòåðôåéñíûå ìåòîäû-----------------------------------------------
+
+ABC_Bicycle::ABC_Bicycle(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide) :IPoint(init_x, init_y)
+{
+	len_handlebar = in_len_handlebar;
+	LenRudder = inLenRudder;
+	is_visible = init_visible;
+	WheelRad = inWheelRad;
+	FrameLen = inFrameLen;
+	FrameHeight = inFrameHeight;
+	FrameWide = inFrameWide;
+}
+
 bool ABC_Bicycle::Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles)
 {
 	Hide();
@@ -220,17 +228,9 @@ bool ABC_Bicycle::Drag(int delta, vector<vector<int>> coord_of_obstacles) // ÂÅÐ
 //-----------------------------------Speed Bike---------------------------------------------
 
 SpeedBike::SpeedBike(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
-	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_speed)
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_speed):
+	ABC_Bicycle(init_x, init_y, in_len_handlebar, inLenRudder, init_visible, inWheelRad, inFrameLen, inFrameHeight, inFrameWide)
 {
-	x = init_x;
-	y = init_y;
-	len_handlebar = in_len_handlebar;
-	LenRudder = inLenRudder;
-	is_visible = init_visible;
-	WheelRad = inWheelRad;
-	FrameLen = inFrameLen;
-	FrameHeight = inFrameHeight;
-	FrameWide = inFrameWide;
 	speed = init_speed;
 }
 
@@ -310,17 +310,9 @@ void SpeedBike:: Hide()
 //---------------------------------Mount Bike---------------------------------------
 
 MountBike::MountBike(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
-	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_wheel_wide)
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide, int init_wheel_wide) :
+	ABC_Bicycle(init_x, init_y, in_len_handlebar, inLenRudder, init_visible, inWheelRad, inFrameLen, inFrameHeight, inFrameWide)
 {
-	x = init_x;
-	y = init_y;
-	len_handlebar = in_len_handlebar;
-	LenRudder = inLenRudder;
-	is_visible = init_visible;
-	WheelRad = inWheelRad;
-	FrameLen = inFrameLen;
-	FrameHeight = inFrameHeight;
-	FrameWide = inFrameWide;
 	wheel_wide = init_wheel_wide;
 }
 
@@ -399,17 +391,9 @@ void MountBike::Hide()
 //----------------------------------------Damaged Bike-----------------------------------------------------
 
 DamagedBike::DamagedBike(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
-	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide) 
+	int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide) :
+	ABC_Bicycle(init_x, init_y, in_len_handlebar, inLenRudder, init_visible, inWheelRad, inFrameLen, inFrameHeight, inFrameWide)
 {
-	x = init_x;
-	y = init_y;
-	len_handlebar = in_len_handlebar;
-	LenRudder = inLenRudder;
-	is_visible = init_visible;
-	WheelRad = inWheelRad;
-	FrameLen = inFrameLen;
-	FrameHeight = inFrameHeight;
-	FrameWide = inFrameWide;
 }
 
 bool DamagedBike::Show(vector<vector<int>> coord_of_obstacles)
