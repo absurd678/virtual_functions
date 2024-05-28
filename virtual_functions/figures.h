@@ -13,73 +13,74 @@ const int SPEED = 25; // константная скорость
 
 
 // -----------------Location------------------
-class Location
+//class Location
+//{
+//protected:
+//	int x; int y;
+//public:
+//	Location(int init_x, int init_y) {
+//		x = init_x;
+//		y = init_y;
+//	} // Location
+//	~Location() {}
+//	// getters, setters
+//	
+//
+//}; // Location
+
+//-----------------------------------ОБЩИЙ РОДИТЕЛЬ (ИНТЕРФЕЙС)---------------------------------
+//--------------------------IPoint------------------------------------------
+class IPoint // ИНТЕРФЕЙС
+{
+public:
+	
+	// getters, setters
+	virtual bool get_visibility() = 0;
+	virtual void set_visibility(bool new_visibility) = 0;
+	
+	virtual bool Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles) = 0;
+	virtual bool Drag(int delta, vector<vector<int>> coord_of_obstacles) = 0;
+}; // Point
+
+//------------------------------------------ПРЕПЯТСТВИЯ--------------------------------------
+//--------------------------ABC_obstacle------------------------------------------
+class ABC_obstacle :public IPoint
 {
 protected:
 	int x; int y;
+	int x1;
+	int y1;
+	int is_visible;
 public:
-	Location(int init_x, int init_y) {
+	ABC_obstacle(int init_x, int init_y, int init_x1, int init_y1, bool init_visible)
+	{
 		x = init_x;
 		y = init_y;
-	} // Location
-	~Location() {}
+		x1 = init_x1;
+		y1 = init_y1;
+		is_visible = init_visible;
+	}
+	// РЕАЛИЗАЦИЯ ИНТЕРФЕЙСНЫХ МЕТОДОВ
+	virtual bool Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles); // перегрузили: координаты препятствий не нужны
+	virtual bool Drag(int delta, vector<vector<int>> coord_of_obstacles); // с while
+	virtual bool get_visibility() { return is_visible; }
+	virtual void set_visibility(bool new_visibility) { is_visible = new_visibility; }
+	
 	// getters, setters
 	int get_x() { return x; }
 	void set_x(int new_x) { x = new_x; }
 	int get_y() { return y; }
 	void set_y(int new_y) { y = new_y; }
-
-}; // Location
-
-//-----------------------------------ОБЩИЙ РОДИТЕЛЬ---------------------------------
-//--------------------------Point------------------------------------------
-class Point :public Location
-{
-protected:
-	bool is_visible;
-public:
-	Point(int init_x, int init_y, bool init_visible) :Location(init_x, init_y)
-	{
-		is_visible = init_visible;
-	} // Point
-	~Point() {}
-	// getters, setters
-	bool get_visibility() { return is_visible; }
-	void set_visibility(bool new_visibility) { is_visible = new_visibility; }
-	
-	bool Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles);
-	bool Drag(int delta, vector<vector<int>> coord_of_obstacles);
-	bool Drag_and_leave(int delta, vector<vector<int>> coord_of_obstacles); // как драг, только без вайла
-	virtual bool Show(vector<vector<int>> coord_of_obstacles);
-	virtual void Hide();
-	/*void Show();
-	void Hide();*/
-}; // Point
-
-//------------------------------------------ПРЕПЯТСТВИЯ--------------------------------------
-//--------------------------Simple_obstacle------------------------------------------
-class Simple_obstacle :public Point
-{
-protected:
-	int x1;
-	int y1;
-public:
-	Simple_obstacle(int init_x, int init_y, int init_x1, int init_y1, bool init_visible) :Point(init_x, init_y, init_visible)
-	{
-		x1 = init_x1;
-		y1 = init_y1;
-	} // Point
-	~Simple_obstacle() {}
-	// getters, setters
 	int get_x1() { return x1; }
 	int get_y1() { return y1; }
 
-	virtual bool Show();
-	virtual void Hide();
+	// ЧИСТЫЕ ВИРТУАЛЬНЫЕ МЕТОДЫ
+	virtual void Show() = 0;
+	virtual void Hide() = 0;
 }; // Point
 
 //--------------------Box-------------------
-class Box :public Simple_obstacle
+class Box :public ABC_obstacle
 {
 protected:
 	int R, G, B;
@@ -87,39 +88,41 @@ public:
 	Box(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_R = 63, int init_G = 161, int init_B = 119);
 	~Box() {}
 
-	virtual bool Show();
+	// РЕАЛИЗАЦИЯ АБСТРАКТНЫХ МЕТОДОВ
+	virtual void Show();
 	virtual void Hide();
 };
 
 //----------------------Tree----------------------
-class Tree :public Simple_obstacle
+class Tree :public ABC_obstacle
 {
 protected:
 	int season;
 public:
 	Tree(int init_x, int init_y, int init_x1, int init_y1, bool init_visible, int init_season);
 	~Tree() {}
-
-	virtual bool Show();
+	// РЕАЛИЗАЦИЯ АБСТРАКТНЫХ МЕТОДОВ
+	virtual void Show();
 	virtual void Hide();
 };
 
 //-------------------Speed Bump----------------------------
-class Speed_bump :public Simple_obstacle
+class Speed_bump :public ABC_obstacle
 {
 public:
-	Speed_bump(int init_x, int init_y, int init_x1, int init_y1, bool init_visible) :
-		Simple_obstacle(init_x, init_y, init_x1, init_y1, init_visible) {}
+	Speed_bump(int init_x, int init_y, int init_x1, int init_y1, bool init_visible);
 	~Speed_bump() {}
-
-	virtual bool Show();
+	// РЕАЛИЗАЦИЯ АБСТРАКТНЫХ МЕТОДОВ
+	virtual void Show();
 	virtual void Hide();
 };
 
 //--------------------------Bicycle------------------------------------------
-class Bicycle :public Point
+class ABC_Bicycle :public IPoint
 {
 protected:
+	int x; int y;
+	int is_visible; // Виден ли велик
 	int len_handlebar; // Длина руля 
 	int LenRudder;// Высота рамы руля
 	int WheelRad;// Радиус колес
@@ -127,15 +130,30 @@ protected:
 	int FrameHeight;// Высота рамы
 	int FrameWide; // Ширина рамы
 public:
-	Bicycle(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible, 
-		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide);
-	~Bicycle() {}
+	ABC_Bicycle(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,
+		int inWheelRad, int inFrameLen, int inFrameHeight, int inFrameWide)
+	{
+		x = init_x;
+		y = init_y;
+		len_handlebar = in_len_handlebar;
+		LenRudder = inLenRudder;
+		is_visible = init_visible;
+		WheelRad = inWheelRad;
+		FrameLen = inFrameLen;
+		FrameHeight = inFrameHeight;
+		FrameWide = inFrameWide;
+	}
+	// РЕАЛИЗАЦИЯ ИНТЕРФЕЙСНЫХ МЕТОДОВ
+	virtual bool Move_to(int newX, int newY, vector<vector<int>> coord_of_obstacles); 
+	virtual bool Drag(int delta, vector<vector<int>> coord_of_obstacles); // без while
+	virtual bool get_visibility() { return is_visible; }
+	virtual void set_visibility(bool new_visibility) { is_visible = new_visibility; }
 
-	//void Move_to(int newX, int newY); // В случае статики возникает дублирование кода
-	//void Drag(int delta); // тож самое
-	virtual bool Show(vector<vector<int>> coord_of_obstacles);
-	virtual void Hide();
 	// Геттеры для всех новых полей
+	int get_x() { return x; }
+	void set_x(int new_x) { x = new_x; }
+	int get_y() { return y; }
+	void set_y(int new_y) { y = new_y; }
 	int get_handlebar() { return len_handlebar;}
 	int get_rudder() { return LenRudder; }
 	int get_wheelrad() { return WheelRad; }
@@ -143,10 +161,14 @@ public:
 	int get_frameheight(){ return FrameHeight; }
 	int get_framewide() { return FrameWide; }
 	int get_speed() { return SPEED; }
+
+	// ЧИСТЫЕ ВИРТУАЛЬНЫЕ ФУНКЦИИ
+	virtual bool Show(vector<vector<int>> coord_of_obstacles) = 0;
+	virtual void Hide() = 0;
 }; // Point
 
 //--------------------------Speed Bike-----------------------------------------
-class SpeedBike : public Bicycle
+class SpeedBike : public ABC_Bicycle
 {
 protected:
 	int speed; // настраиваемая скорость
@@ -162,7 +184,7 @@ public:
 
 
 //---------------------------------Mount Bike---------------------------------------
-class MountBike : public Bicycle
+class MountBike : public ABC_Bicycle
 {
 protected:
 	int wheel_wide; // толщина колес
@@ -177,7 +199,7 @@ public:
 
 
 //--------------------------------DamagedBike-------------------------------------------
-class DamagedBike :public Bicycle
+class DamagedBike :public ABC_Bicycle
 {
 public:
 	DamagedBike(int init_x, int init_y, int in_len_handlebar, int inLenRudder, bool init_visible,

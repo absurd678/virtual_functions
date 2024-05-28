@@ -37,13 +37,13 @@ int WheelRad = 40;  // Радиус колес
 int FrameLen = 100;  // Длина рамы
 int FrameHeight = 50;  // Высота рамы
 int x = 600; int y = 400;  // Координаты велосипеда (определяют координаты руля!)
-Bicycle* pbike;
+ABC_Bicycle* pbike;
 
 //----------------------------МАССИВЫ-----------------------------------
 
 
 //---------------------------ПРОТОТИПЫ ФУНКЦИЙ-------------------------------
-void play(Bicycle* pBike, vector<vector<int>> all_obstacles, Simple_obstacle** all_pObstacles,
+void play(ABC_Bicycle* pBike, vector<vector<int>> all_obstacles, ABC_obstacle** all_pObstacles,
 	int obstacles_amount, int coord_amount, int startx, int starty);
 
 
@@ -51,9 +51,6 @@ void play(Bicycle* pBike, vector<vector<int>> all_obstacles, Simple_obstacle** a
 int main()
 {
     hdc = GetDC(GetConsoleWindow()); // Получаем контекст устройства консоли
-	
-
-	
 
 	// Bicycle
 	SpeedBike bike1(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 50);
@@ -62,8 +59,8 @@ int main()
 	Box obstacle1(500, 100, 530, 130, 0); // коробка 30х30
 	Tree obstacle2(20, 20, 70, 90, 0, 0); // дерево 50х70
 	Speed_bump obstacle3(20, 500, 90, 520, 0); // лежачий полицейский 70х20
-	Simple_obstacle obstacle4(500, 300, 530, 330, 0); // просто препятствие 30x30
-	Simple_obstacle** obstacle_objects = new Simple_obstacle * [amount] { &obstacle1, &obstacle2, &obstacle3, &obstacle4 }; // массив указателей на препятствия
+	Box obstacle4(500, 300, 530, 330, 0); // коробка 30x30
+	ABC_obstacle** obstacle_objects = new ABC_obstacle * [amount] { &obstacle1, &obstacle2, &obstacle3, &obstacle4 }; // массив указателей на препятствия
 	vector<vector<int>> obstacle_matr(amount, vector<int>(coordinates, 0));
 	//int** obstacle_matr = new int*[amount];
 	
@@ -81,8 +78,9 @@ int main()
     ReleaseDC(GetConsoleWindow(), hdc); // Освобождаем контекст устройства после использования
 } // main
 
+
 //--------------------------------РЕАЛИЗАЦИЯ ФУНКЦИЙ-------------------------------------------
-void play(Bicycle* pBike, vector<vector<int>> all_obstacles, Simple_obstacle** all_pObstacles, 
+void play(ABC_Bicycle* pBike, vector<vector<int>> all_obstacles, ABC_obstacle** all_pObstacles, 
 	int obstacles_amount, int coord_amount, int startx, int starty)
 {
 	// ПЕРЕМЕННЫЕ
@@ -111,7 +109,7 @@ void play(Bicycle* pBike, vector<vector<int>> all_obstacles, Simple_obstacle** a
 			is_damaged = 1;
 			is_collision = 0;
 		}
-		is_collision = pBike->Drag_and_leave(pBike->get_speed(), all_obstacles);
+		is_collision = pBike->Drag(pBike->get_speed(), all_obstacles);
 	}
 
 } // play
