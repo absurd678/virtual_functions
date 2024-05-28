@@ -56,7 +56,7 @@ int main()
 	
 
 	// Bicycle
-	SpeedBike bike1(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 25);
+	SpeedBike bike1(x, y, len_handlebar, LenRudder, 0, WheelRad, FrameLen, FrameHeight, 10, 50);
 	pbike = &bike1;
 	
 	Box obstacle1(500, 100, 530, 130, 0); // коробка 30х30
@@ -81,6 +81,7 @@ int main()
     ReleaseDC(GetConsoleWindow(), hdc); // Освобождаем контекст устройства после использования
 } // main
 
+//--------------------------------РЕАЛИЗАЦИЯ ФУНКЦИЙ-------------------------------------------
 void play(Bicycle* pBike, vector<vector<int>> all_obstacles, Simple_obstacle** all_pObstacles, 
 	int obstacles_amount, int coord_amount, int startx, int starty)
 {

@@ -156,6 +156,7 @@ public:
 	~SpeedBike(){}
 
 	virtual bool Show(vector<vector<int>> coord_of_obstacles);
+	virtual void Hide();
 	int get_speed() { return speed; } // Скорость теперь можно менять
 };
 

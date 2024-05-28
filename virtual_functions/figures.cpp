@@ -335,6 +335,7 @@ bool SpeedBike::Show(vector<vector<int>> coord_of_obstacles)
 	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide); // Руль
 
 	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	Rectangle(hdc, init_x, y, init_x + FrameWide, y + FrameWide*1.5); // Фонарь на руле
 	init_y = y + FrameWide;
 	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder); // Рама руля
 
@@ -344,6 +345,7 @@ bool SpeedBike::Show(vector<vector<int>> coord_of_obstacles)
 
 	init_x = init_x + FrameLen - FrameWide;
 	init_y -= FrameWide;
+
 	Rectangle(hdc, init_x, init_y, init_x + FrameWide + WheelRad, init_y + COEFF * FrameHeight); // Седло
 
 	// колесо 1
@@ -357,6 +359,41 @@ bool SpeedBike::Show(vector<vector<int>> coord_of_obstacles)
 	DeleteObject(hPen);
 	is_collision = check_collision(coord_of_obstacles, x, y, init_x + WheelRad, init_y + WheelRad);
 	return is_collision;
+} // Show
+
+void SpeedBike:: Hide()
+{
+	int init_x, init_y, init_x1, init_y1;
+	int is_collision;
+	is_visible = 1;
+	HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 255, 255)); // Стандартный стиль, толщина wide пиксель, красный цвет
+	SelectObject(hdc, hPen);
+
+	Rectangle(hdc, x, y, x + len_handlebar, y + FrameWide); // Руль
+
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	Rectangle(hdc, init_x, y, init_x + FrameWide, y + FrameWide * 1.5); // Фонарь на руле
+	init_y = y + FrameWide;
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide, y + LenRudder); // Рама руля
+
+	init_x += FrameWide;
+	init_y = y + FrameWide + COEFF * LenRudder;
+	Rectangle(hdc, init_x, init_y, init_x + FrameLen, init_y + 2 * COEFF * LenRudder); // Рама
+
+	init_x = init_x + FrameLen - FrameWide;
+	init_y -= FrameWide;
+
+	Rectangle(hdc, init_x, init_y, init_x + FrameWide + WheelRad, init_y + COEFF * FrameHeight); // Седло
+
+	// колесо 1
+	init_x = x + len_handlebar / 2 - FrameWide / 2;
+	init_y = y + FrameWide + LenRudder;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad); // Левое колесо
+	// колесо 2
+	init_x += FrameLen + FrameWide / 2;
+	Ellipse(hdc, init_x - WheelRad, init_y - WheelRad, init_x + WheelRad, init_y + WheelRad); // Правое колесо
+
+	DeleteObject(hPen);
 }
 
 
@@ -427,7 +464,7 @@ void MountBike::Hide()
 	init_y -= FrameWide;
 	Rectangle(hdc, init_x, init_y, init_x + FrameWide + WheelRad, init_y + COEFF * FrameHeight); // Седло
 
-	hPen = CreatePen(PS_SOLID, wheel_wide, RGB(0, 0, 0));
+	hPen = CreatePen(PS_SOLID, wheel_wide, RGB(255, 255, 255));
 	SelectObject(hdc, hPen);
 	// колесо 1
 	init_x = x + len_handlebar / 2 - FrameWide / 2;
